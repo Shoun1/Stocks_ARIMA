@@ -70,7 +70,7 @@ def make_predictions(lm,x_test,y_test,data):
     subset1 = data[(data['Open'] >= 620 ) & (data['Open'] <= 660)]
     print(subset1)
 
-    new_data = pd.DataFrame(data)
+    new_data = pd.DataFrame(input_data)
     print(new_data)
     '''X = new_data[['Open','High','Low','PrevClose']].values
     Y = y_train[0:len(new_data)]
