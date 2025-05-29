@@ -53,30 +53,23 @@ def train_model():
     x_test = scaler.transform(x_test)
     lm = LinearRegression()
     lm.fit(x_train,y_train)
-    return lm,x_test,y_test
+    return lm,x_test,y_test,data
     
 
-def make_predictions(lm,x_test,y_test):
+def make_predictions(lm,x_test,y_test,data):
     #predicting closing price on test data model makes its own predictions
     #y_pred = lm.predict(x_train)
     y_pred = lm.predict(x_test)
     
     #predicting closing price on a new dataset model makes predictions on input data
-    data = {'Open':[620,655,658,660,662,664],
+    input_data = {'Open':[620,655,658,660,662,664],
             'High':[630,665,660,665,660,665],
             'Low':[620,625,630,640,645,650],
             'PrevClose':[630,635,640,645,650,655]}
 
-    similar_rows = df[
-    (df['Open'].between(620, 660)) &
-    (df['High'].between(, 82000)) &
-    (df['Low'].between(21, 23))
-    ]
+    subset1 = data[(data['Open'] >= 620 ) & (data['Open'] <= 660)]
+    print(subset1)
 
-    # Then compare model predictions vs actual for those rows
-    X_similar = similar_rows.drop('target', axis=1)
-    y_actual = similar_rows['target']
-    y_pred = model.predict(X_similar)
     new_data = pd.DataFrame(data)
     print(new_data)
     '''X = new_data[['Open','High','Low','PrevClose']].values
@@ -125,6 +118,7 @@ def graph(m,c,x_range):
     y = m*x+c
     plt.plot(x,y)
     plt.savefig('/home/shoun1/airflow/dags/regr_line.jpeg')
+
 def graph_multiregression(X, y_pred, feature_name='Open'):
     x = X[feature_name]
     y = y_pred
@@ -169,8 +163,8 @@ def process_predictions(x,x_train,y_train,x_test,y_test,y_pred):
 
 load_data(0,98)
 preprocess_data()
-lm,x_test,y_test = train_model()
-make_predictions(lm,x_test,y_test)
+lm,x_test,y_test,data = train_model()
+make_predictions(lm,x_test,y_test,data)
 
 '''default_args = {
     'owner':'shoun10',
