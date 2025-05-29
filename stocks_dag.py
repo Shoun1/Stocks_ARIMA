@@ -17,7 +17,7 @@ def load_data(lb,ub):
     df = pd.read_csv('/home/shoun1/lic.csv')
     data = df.iloc[lb:ub]
     #print(data.head())
-    print(data[['Open','High','Low']].iloc[0:6])
+    #print(data[['Open','High','Low']].iloc[0:6])
     #print(data.tail())
     #print(data.shape)
     #print(data.info())
@@ -66,12 +66,18 @@ def make_predictions(lm,x_test,y_test,data):
             'High':[630,665,660,665,660,665],
             'Low':[620,625,630,640,645,650],
             'PrevClose':[630,635,640,645,650,655]}
-
-    subset1 = data[(data['Open'] >= 620 ) & (data['Open'] <= 660)]
+    new_data = pd.DataFrame(input_data)
+    opmin,opmax = new_data['Open'].min(),new_data['Open'].max()
+    himin,himax = new_data['High'].min(),new_data['High'].max()
+    lomin,lomax = new_data['Low'].min(),new_data['Low'].max()
+    prevmin,prevmax = new_data['PrevClose'].min(),new_data['PrevClose'].max()
+    #filter out nearby values 
+    subset1 = data[(data['Open'] >= opmin ) & (data['Open'] <= opmax) & 
+    (data['High'] >= himin ) & (data['High'] <= himax) &  (data['Low'] >= lomin ) & (data['Low'] <= lomax) &
+    (data['PrevClose'] >= prevmin ) & (data['PrevClose'] <= prevmax) ]
     print(subset1)
 
-    new_data = pd.DataFrame(input_data)
-    print(new_data)
+    #print(new_data)
     '''X = new_data[['Open','High','Low','PrevClose']].values
     Y = y_train[0:len(new_data)]
     X_train,X_test,Y_train,Y_test = train_test_split(X,Y,test_size=0.2,random_state=1)
