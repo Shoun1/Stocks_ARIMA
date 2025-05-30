@@ -60,13 +60,16 @@ def make_predictions(lm,x_test,y_test,data):
     #predicting closing price on test data model makes its own predictions
     #y_pred = lm.predict(x_train)
     y_pred = lm.predict(x_test)
-    
+
     #predicting closing price on a new dataset model makes predictions on input data
     input_data = {'Open':[620,655,658,660,662,664],
             'High':[630,665,660,665,660,665],
             'Low':[620,625,630,640,645,650],
             'PrevClose':[630,635,640,645,650,655]}
     new_data = pd.DataFrame(input_data)
+    y_pred_data = lm.predict(new_data)
+    '''estimating the 
+    actual closing prices'''
     opmin,opmax = new_data['Open'].min(),new_data['Open'].max()
     himin,himax = new_data['High'].min(),new_data['High'].max()
     lomin,lomax = new_data['Low'].min(),new_data['Low'].max()
@@ -75,21 +78,17 @@ def make_predictions(lm,x_test,y_test,data):
     subset1 = data[(data['Open'] >= opmin ) & (data['Open'] <= opmax) & 
     (data['High'] >= himin ) & (data['High'] <= himax) &  (data['Low'] >= lomin ) & (data['Low'] <= lomax) &
     (data['PrevClose'] >= prevmin ) & (data['PrevClose'] <= prevmax) ]
-    print(subset1)
-
-    #print(new_data)
-    '''X = new_data[['Open','High','Low','PrevClose']].values
-    Y = y_train[0:len(new_data)]
-    X_train,X_test,Y_train,Y_test = train_test_split(X,Y,test_size=0.2,random_state=1)
-    #scaler = StandardScaler()
-    #new_data_scaled = scaler.transform(new_data)
-
-    #y_pred_data = lm.predict(new_data_scaled)
-    y_pred_data = lm.predict(new_data)
-    plt.scatter(Y_test,y_pred_data)
-    plt.savefig('/home/shoun1/airflow/dags/newpred_com.jpeg')
+    subset1_close = subset1['Close']
     print("Predicted values: {}".format(y_pred_data))
+    print(len(subset1_close))
+    print(len(y_pred_data[0:4]))
+    #comparing the estimated actual and predicted closing prices
+    plt.scatter(subset1_close,y_pred_data[0:4])
+    plt.savefig('/home/shoun1/airflow/dags/newpred_com.jpeg')
 
+    #plt.scatter(Y_test,y_pred_data)
+    #plt.savefig('/home/shoun1/airflow/dags/newpred_com.jpeg')
+    
     rmse = mean_squared_error(y_test,y_pred)
     print("Root mean squared error: {:.2f}".format(rmse))
 
@@ -104,7 +103,8 @@ def make_predictions(lm,x_test,y_test,data):
     print("Regression coefficients: {}".format(m))
     c = lm.intercept_
     print("Regression intercept: {}".format(c))
-    plt.scatter(y_test[0:10],y_pred[0:10])
+    plt.scatter(x_train,y_train)
+    plt.plot(
     plt.savefig('/home/shoun1/airflow/dags/multiregr.jpeg')
     graph(m,c,range(620,920))
     #graph_multiregression(new_data, y_pred_data, feature_name='High')
@@ -138,7 +138,7 @@ def graph_multiregression(X, y_pred, feature_name='Open'):
     plt.savefig('/home/shoun1/airflow/dags/multiregr_line.jpeg')
     plt.close()
 
-def process_predictions(x,x_train,y_train,x_test,y_test,y_pred):
+'''def process_predictions(x,x_train,y_train,x_test,y_test,y_pred):
     regr = LinearRegression()
     regr.fit(x_train,y_train)
     features = x.columns
