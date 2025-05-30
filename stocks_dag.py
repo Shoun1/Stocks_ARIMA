@@ -32,9 +32,9 @@ def preprocess_data():
 
     # Plot with Seaborn
     plt.figure(figsize=(10, 6))
-    sns.boxplot(x='Features', y='Values', data=data_melted)
-    plt.title('Box Plot of Open, Low, High, and Close for Outlier Detection')
-    plt.savefig('/home/shoun1/airflow/dags/boxplot.png')
+    #sns.boxplot(x='Features', y='Values', data=data_melted)
+    #plt.title('Box Plot of Open, Low, High, and Close for Outlier Detection')
+    #plt.savefig('/home/shoun1/airflow/dags/boxplot.png')
     
 
 def train_model():
@@ -83,12 +83,13 @@ def make_predictions(lm,x_train,y_train,x_test,y_test,data):
     print(len(subset1_close))
     print(len(y_pred_data[0:4]))
     #comparing the estimated actual and predicted closing prices
-    plt.scatter(subset1_close,y_pred_data[0:4])
-    plt.savefig('/home/shoun1/airflow/dags/newpred_com.jpeg')
+    #plt.scatter(subset1_close,y_pred_data[0:4])
+    #plt.savefig('/home/shoun1/airflow/dags/newpred_com.jpeg')
 
     #plt.scatter(Y_test,y_pred_data)
     #plt.savefig('/home/shoun1/airflow/dags/newpred_com.jpeg')
-
+    print(x_test.shape)
+    print(y_test.shape)
     plt.scatter(x_test[:,0],y_test)
     plt.xlabel('Predicted Closing Price')
     plt.ylabel('Actual Closing Price')
