@@ -111,8 +111,15 @@ def make_predictions(lm,x_test,y_test,data):
     plt.xlabel('Predicted Closing Price')
     plt.ylabel('Actual Closing Price')
     plt.savefig('/home/shoun1/airflow/dags/comaparison_plot.jpeg')
+    
+    sns.regplot(y_test,y_pred)
+    plt.title('Actual vs Prediction')
+    plt.xlabel('Actual')
+    plt.ylabel('Predicted')
+    plt.savefig('/home/shoun1/airflow/dags/comaparison_plot.jpeg')
+    
     #plt.scatter(x_train,y_train)
-    #plt.plot(
+    #plt.plot
     plt.savefig('/home/shoun1/airflow/dags/multiregr.jpeg')
     graph(m,c,range(620,920))
     #graph_multiregression(new_data, y_pred_data, feature_name='High')
