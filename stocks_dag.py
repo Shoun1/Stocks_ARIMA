@@ -53,10 +53,10 @@ def train_model():
     x_test = scaler.transform(x_test)
     lm = LinearRegression()
     lm.fit(x_train,y_train)
-    return lm,x_test,y_test,data
+    return lm,x_train,y_train,x_test,y_test,data
     
 
-def make_predictions(lm,x_test,y_test,data):
+def make_predictions(lm,x_train,y_train,x_test,y_test,data):
     #predicting closing price on test data model makes its own predictions
     #y_pred = lm.predict(x_train)
     y_pred = lm.predict(x_test)
@@ -88,6 +88,11 @@ def make_predictions(lm,x_test,y_test,data):
 
     #plt.scatter(Y_test,y_pred_data)
     #plt.savefig('/home/shoun1/airflow/dags/newpred_com.jpeg')
+
+    plt.scatter(x_test[:,0],y_test)
+    plt.xlabel('Predicted Closing Price')
+    plt.ylabel('Actual Closing Price')
+    plt.savefig('/home/shoun1/airflow/dags/Stocks_ARIMA/comparison_plot.jpeg')
     
     rmse = mean_squared_error(y_test,y_pred)
     print("Root mean squared error: {:.2f}".format(rmse))
@@ -106,17 +111,18 @@ def make_predictions(lm,x_test,y_test,data):
 
     df_compare = pd.DataFrame({'actual': y_test,'predicted': y_pred})
     print(df_compare)
-
-    plt.scatter(y_test,y_pred)
-    plt.xlabel('Predicted Closing Price')
-    plt.ylabel('Actual Closing Price')
-    plt.savefig('/home/shoun1/airflow/dags/comaparison_plot.jpeg')
     
-    sns.regplot(y_test,y_pred)
+    '''print(len(x_train[:,0]))
+    print(len(y_pred))
+    plt.plot(x_test,y_pred,color='red')
+    plt.savefig('/home/shoun1/airflow/dags/comparison_plot.jpeg')
+    print(type(y_test))
+    print(type(y_pred))
+    sns.regplot(x=y_test.flatten(),y=y_pred.flatten())
     plt.title('Actual vs Prediction')
     plt.xlabel('Actual')
     plt.ylabel('Predicted')
-    plt.savefig('/home/shoun1/airflow/dags/comaparison_plot.jpeg')
+    plt.savefig('/home/shoun1/airflow/dags/comaparison_plot.jpeg')'''
     
     #plt.scatter(x_train,y_train)
     #plt.plot
@@ -184,8 +190,8 @@ def graph_multiregression(X, y_pred, feature_name='Open'):
 
 load_data(0,98)
 preprocess_data()
-lm,x_test,y_test,data = train_model()
-make_predictions(lm,x_test,y_test,data)
+lm,x_train,y_train,x_test,y_test,data = train_model()
+make_predictions(lm,x_train,y_train,x_test,y_test,data)
 
 '''default_args = {
     'owner':'shoun10',
