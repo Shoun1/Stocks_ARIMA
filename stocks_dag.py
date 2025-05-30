@@ -91,8 +91,6 @@ def make_predictions(lm,x_train,y_train,x_test,y_test,data):
     print(x_test.shape)
     print(y_test.shape)
     plt.scatter(x_test[:,0],y_test)
-    plt.xlabel('Predicted Closing Price')
-    plt.ylabel('Actual Closing Price')
     plt.savefig('/home/shoun1/airflow/dags/Stocks_ARIMA/comparison_plot.jpeg')
     
     rmse = mean_squared_error(y_test,y_pred)
