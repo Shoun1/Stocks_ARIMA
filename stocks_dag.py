@@ -103,8 +103,16 @@ def make_predictions(lm,x_test,y_test,data):
     print("Regression coefficients: {}".format(m))
     c = lm.intercept_
     print("Regression intercept: {}".format(c))
-    plt.scatter(x_train,y_train)
-    plt.plot(
+
+    df_compare = pd.DataFrame({'actual': y_test,'predicted': y_pred})
+    print(df_compare)
+
+    plt.scatter(y_test,y_pred)
+    plt.xlabel('Predicted Closing Price')
+    plt.ylabel('Actual Closing Price')
+    plt.savefig('/home/shoun1/airflow/dags/comaparison_plot.jpeg')
+    #plt.scatter(x_train,y_train)
+    #plt.plot(
     plt.savefig('/home/shoun1/airflow/dags/multiregr.jpeg')
     graph(m,c,range(620,920))
     #graph_multiregression(new_data, y_pred_data, feature_name='High')
