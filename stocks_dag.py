@@ -56,43 +56,20 @@ def train_model():
     return lm,x_train,y_train,x_test,y_test,data
     
 
-def make_predictions(lm,x_train,y_train,x_test,y_test,data):
+def make_predictions(lm,x_train,y_train,x_test,y_test):
     #predicting closing price on test data model makes its own predictions
     #y_pred = lm.predict(x_train)
     y_pred = lm.predict(x_test)
-
     #predicting closing price on a new dataset model makes predictions on input data
     input_data = {'Open':[620,655,658,660,662,664],
             'High':[630,665,660,665,660,665],
             'Low':[620,625,630,640,645,650],
             'PrevClose':[630,635,640,645,650,655]}
     new_data = pd.DataFrame(input_data)
-    y_pred_data = lm.predict(new_data)
-    '''estimating the 
-    actual closing prices'''
-    opmin,opmax = new_data['Open'].min(),new_data['Open'].max()
-    himin,himax = new_data['High'].min(),new_data['High'].max()
-    lomin,lomax = new_data['Low'].min(),new_data['Low'].max()
-    prevmin,prevmax = new_data['PrevClose'].min(),new_data['PrevClose'].max()
-    #filter out nearby values 
-    subset1 = data[(data['Open'] >= opmin ) & (data['Open'] <= opmax) & 
-    (data['High'] >= himin ) & (data['High'] <= himax) &  (data['Low'] >= lomin ) & (data['Low'] <= lomax) &
-    (data['PrevClose'] >= prevmin ) & (data['PrevClose'] <= prevmax) ]
-    subset1_close = subset1['Close']
-    print("Predicted values: {}".format(y_pred_data))
-    print(len(subset1_close))
-    print(len(y_pred_data[0:4]))
-    #comparing the estimated actual and predicted closing prices
-    #plt.scatter(subset1_close,y_pred_data[0:4])
-    #plt.savefig('/home/shoun1/airflow/dags/newpred_com.jpeg')
 
-    #plt.scatter(Y_test,y_pred_data)
-    #plt.savefig('/home/shoun1/airflow/dags/newpred_com.jpeg')
-    print(x_test.shape)
-    print(y_test.shape)
-    plt.scatter(x_test[:,0],y_test)
-    plt.savefig('/home/shoun1/airflow/dags/Stocks_ARIMA/comparison_plot.jpeg')
-    
+    new_data = StandardScaler().fit_transform(new_data)
+    y_pred_data = lm.predict(new_data)
+
     rmse = mean_squared_error(y_test,y_pred)
     print("Root mean squared error: {:.2f}".format(rmse))
 
@@ -110,53 +87,16 @@ def make_predictions(lm,x_train,y_train,x_test,y_test,data):
 
     df_compare = pd.DataFrame({'actual': y_test,'predicted': y_pred})
     print(df_compare)
-    
-    '''print(len(x_train[:,0]))
-    print(len(y_pred))
-    plt.plot(x_test,y_pred,color='red')
-    plt.savefig('/home/shoun1/airflow/dags/comparison_plot.jpeg')
-    print(type(y_test))
-    print(type(y_pred))
-    sns.regplot(x=y_test.flatten(),y=y_pred.flatten())
-    plt.title('Actual vs Prediction')
-    plt.xlabel('Actual')
-    plt.ylabel('Predicted')
-    plt.savefig('/home/shoun1/airflow/dags/comaparison_plot.jpeg')'''
-    
-    #plt.scatter(x_train,y_train)
-    #plt.plot
-    plt.savefig('/home/shoun1/airflow/dags/multiregr.jpeg')
-    graph(m,c,range(620,920))
-    #graph_multiregression(new_data, y_pred_data, feature_name='High')
+    correlation = np.corrcoef(df_compare['actual'], df_compare['predicted'])
+    print(f"Correlation: {correlation}")
 
-    # Plot result
-    #graph(range(len(y_manual), y_manual, x_label='Row Index'))
+    # Define accuracy as the % of predictions within ±₹10 of actual
+    '''threshold = 10
+    diff = np.abs(y_test - y_pred_data)
+    accuracy = np.mean(diff <= threshold) * 100
 
-    #print(len(x_train))
-    #print(len(y_train))
-    
-    #plt.scatter(df['Open','High','Low','PrevClose'].values,df['Close'].values)
-    #plt.scatter(x_train,y_train)
-    #plt.plot(y_test,y_pred)
+    print(f"Custom Regression Accuracy (±₹{threshold}): {accuracy:.2f}%")'''
 
-def graph(m,c,x_range):
-    x = np.array(x_range)
-    y = m*x+c
-    plt.plot(x,y)
-    plt.savefig('/home/shoun1/airflow/dags/regr_line.jpeg')
-
-def graph_multiregression(X, y_pred, feature_name='Open'):
-    x = X[feature_name]
-    y = y_pred
-    plt.figure()
-    plt.plot(x, y, marker='o', label='Predicted Close')
-    plt.xlabel(feature_name)
-    plt.ylabel('Predicted Close')
-    plt.title(f'Multiple Linear Regression: {feature_name} vs Predicted Close')
-    plt.legend()
-    plt.grid(True)
-    plt.savefig('/home/shoun1/airflow/dags/multiregr_line.jpeg')
-    plt.close()
 
 '''def process_predictions(x,x_train,y_train,x_test,y_test,y_pred):
     regr = LinearRegression()
@@ -187,11 +127,31 @@ def graph_multiregression(X, y_pred, feature_name='Open'):
         print("Regression intercept: {}".format(regr.intercept_))
         plt.savefig('/home/shoun1/airflow/dags/stocks_plot2.png')'''
 
+def visualize_predictions():
+    data = pd.read_csv('/home/shoun1/batch_data.csv')
+    train,test = train_test_split(data,test_size=0.2)
+
+    X_train = np.array(train.index).reshape(-1, 1)
+    y_train = train['Close']
+    # Create LinearRegression Object
+    model = LinearRegression()
+    # Fit linear model using the train data set
+    model.fit(X_train, y_train)
+
+    plt.figure(1, figsize=(16,10))
+    plt.title('Linear Regression | Price vs Time')
+    plt.scatter(X_train, y_train, edgecolor='w', label='Actual Price')
+    plt.plot(X_train, model.predict(X_train), color='r', label='Predicted Price')
+    plt.xlabel('Integer Date')
+    plt.ylabel('Stock Price')
+    plt.savefig('/home/shoun1/airflow/dags/Stocks_ARIMA/plots/linear_regression.png')
+    
+
 load_data(0,98)
 preprocess_data()
 lm,x_train,y_train,x_test,y_test,data = train_model()
-make_predictions(lm,x_train,y_train,x_test,y_test,data)
-
+make_predictions(lm,x_train,y_train,x_test,y_test)
+visualize_predictions()
 '''default_args = {
     'owner':'shoun10',
     'start_date' : dt.datetime(2023,10,20),
