@@ -16,13 +16,13 @@ from sklearn.metrics import mean_squared_error,mean_absolute_error,r2_score
 def load_data(lb,ub):
     df = pd.read_csv('/home/shoun1/lic.csv')
     data = df.iloc[lb:ub]
-    #print(data.head())
-    #print(data[['Open','High','Low']].iloc[0:6])
-    #print(data.tail())
-    #print(data.shape)
-    #print(data.info())
+    print(data.head())
+    print(data[['Open','High','Low']].iloc[0:6])
+    print(data.tail())
+    print(data.shape)
+    print(data.info())
     #perform Exploratory Data Analysis
-    #print(data.describe())
+    print(data.describe())
     data.to_csv('/home/shoun1/batch_data.csv',index=False)
 
 def preprocess_data():
@@ -32,9 +32,9 @@ def preprocess_data():
 
     # Plot with Seaborn
     plt.figure(figsize=(10, 6))
-    #sns.boxplot(x='Features', y='Values', data=data_melted)
-    #plt.title('Box Plot of Open, Low, High, and Close for Outlier Detection')
-    #plt.savefig('/home/shoun1/airflow/dags/boxplot.png')
+    sns.boxplot(x='Features', y='Values', data=data_melted)
+    plt.title('Box Plot of Open, Low, High, and Close for Outlier Detection')
+    plt.savefig('/home/shoun1/airflow/dags/Stocks_ARIMA/plots/boxplot.png')
     
 
 def train_model():
@@ -90,14 +90,36 @@ def make_predictions(lm,x_train,y_train,x_test,y_test):
     correlation = np.corrcoef(df_compare['actual'], df_compare['predicted'])
     print(f"Correlation: {correlation}")
 
-    # Define accuracy as the % of predictions within ±₹10 of actual
-    '''threshold = 10
-    diff = np.abs(y_test - y_pred_data)
-    accuracy = np.mean(diff <= threshold) * 100
+def visualize_predictions():
+    data = pd.read_csv('/home/shoun1/batch_data.csv')
+    train,test = train_test_split(data,test_size=0.2)
 
-    print(f"Custom Regression Accuracy (±₹{threshold}): {accuracy:.2f}%")'''
+    X_train = np.array(train.index).reshape(-1, 1)
+    y_train = train['Close']
+    # Create LinearRegression Object
+    model = LinearRegression()
+    # Fit linear model using the train data set
+    model.fit(X_train, y_train)
+
+    plt.figure(1, figsize=(16,10))
+    plt.title('Linear Regression | Price vs Time')
+    plt.scatter(X_train, y_train, edgecolor='w', label='Actual Price')
+    plt.plot(X_train, model.predict(X_train), color='r', label='Predicted Price')
+    plt.xlabel('Integer Date')
+    plt.ylabel('Stock Price')
+    plt.savefig('/home/shoun1/airflow/dags/Stocks_ARIMA/plots/linear_regression.png')
+    
+
+load_data(0,98)
+preprocess_data()
+lm,x_train,y_train,x_test,y_test,data = train_model()
+make_predictions(lm,x_train,y_train,x_test,y_test)
+visualize_predictions()
 
 
+
+#sample code for processing predictions
+#this was not used in the final code but can be used for further analysis
 '''def process_predictions(x,x_train,y_train,x_test,y_test,y_pred):
     regr = LinearRegression()
     regr.fit(x_train,y_train)
@@ -126,88 +148,3 @@ def make_predictions(lm,x_train,y_train,x_test,y_test):
         print("Regression coefficient: {}".format(regr.coef_))
         print("Regression intercept: {}".format(regr.intercept_))
         plt.savefig('/home/shoun1/airflow/dags/stocks_plot2.png')'''
-
-def visualize_predictions():
-    data = pd.read_csv('/home/shoun1/batch_data.csv')
-    train,test = train_test_split(data,test_size=0.2)
-
-    X_train = np.array(train.index).reshape(-1, 1)
-    y_train = train['Close']
-    # Create LinearRegression Object
-    model = LinearRegression()
-    # Fit linear model using the train data set
-    model.fit(X_train, y_train)
-
-    plt.figure(1, figsize=(16,10))
-    plt.title('Linear Regression | Price vs Time')
-    plt.scatter(X_train, y_train, edgecolor='w', label='Actual Price')
-    plt.plot(X_train, model.predict(X_train), color='r', label='Predicted Price')
-    plt.xlabel('Integer Date')
-    plt.ylabel('Stock Price')
-    plt.savefig('/home/shoun1/airflow/dags/Stocks_ARIMA/plots/linear_regression.png')
-    
-
-load_data(0,98)
-preprocess_data()
-lm,x_train,y_train,x_test,y_test,data = train_model()
-make_predictions(lm,x_train,y_train,x_test,y_test)
-visualize_predictions()
-'''default_args = {
-    'owner':'shoun10',
-    'start_date' : dt.datetime(2023,10,20),
-    'retries' : 1,
-    'retry_delay': dt.timedelta(minutes=5),
-}
-
-with DAG(
-    'stockprice_tracker',
-    default_args = default_args,
-    schedule_interval = '@daily',
-    catchup = False
-) as dag:
-
-    load_data_task = PythonVirtualenvOperator(
-        task_id = 'load_data',
-        python_callable=load_data,
-        op_args=[0,98],
-        dag=dag
-    )
-
-    preprocess_data_task = PythonVirtualenvOperator(
-        task_id = 'preprocess_data',
-        python_callable = preprocess_data,
-        dag = dag
-    )
-
-    train_model_task = PythonVirtualenvOperator(
-        task_id = 'train_model',
-        python_callable = train_model,
-        dag=dag
-    )
-
-    make_predictions_task = PythonVirtualenvOperator(
-        task_id = 'make_predictions',
-        python_callable=make_predictions,
-        op_args=[x,x_train,y_train,x_test,y_test],
-        dag=dag
-    )
-
-    process_predictions_task = PythonVirtualenvOperator(
-        task_id = 'process_predictions',
-        python_callable= process_predictions,
-        op_args=[x,x_train,y_train,x_test,y_test,y_pred],
-        provide_context = True,
-        dag=dag
-    )
-
-load_data_task >> preprocess_data_task >> train_model_task >> make_predictions_task >> process_predictions_task'''
-
-
-
-
-
-
-
-
-
-
