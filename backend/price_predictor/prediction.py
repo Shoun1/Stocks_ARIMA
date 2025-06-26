@@ -59,7 +59,7 @@ def train_model():
     return lm,x_train,y_train,x_test,y_test,data
     
 
-def make_predictions(lm,x_train,y_train,x_test,y_test):
+def make_predictions(lm,x_train,y_train,x_test,y_test,Open,High,Low,PrevClose):
     #predicting closing price on test data model makes its own predictions
     #y_pred = lm.predict(x_train)
     y_pred = lm.predict(x_test)
@@ -69,7 +69,11 @@ def make_predictions(lm,x_train,y_train,x_test,y_test):
             'Low':[620,625,630,640,645,650],
             'PrevClose':[630,635,640,645,650,655]}'''
 
-    
+    input_data = {'Open':Open,
+                   'High': High,
+                   'Low':Low,
+                   'PrevClose':PrevClose}
+
     new_data = pd.DataFrame(input_data)
 
     new_data = StandardScaler().fit_transform(new_data)
