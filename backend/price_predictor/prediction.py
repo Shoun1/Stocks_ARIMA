@@ -56,30 +56,28 @@ def train_model():
     x_test = scaler.transform(x_test)
     lm = LinearRegression()
     lm.fit(x_train,y_train)
-    return lm,x_train,y_train,x_test,y_test,data
+    return lm,x_train,y_train,x_test,y_test,scaler
     
 
-def make_predictions(lm,x_train,y_train,x_test,y_test,Open,High,Low,PrevClose):
+def make_predictions(lm,x_train,y_train,x_test,y_test,scaler,Open,High,Low,PrevClose):
     #predicting closing price on test data model makes its own predictions
     #y_pred = lm.predict(x_train)
     y_pred = lm.predict(x_test)
-    #predicting closing price on a new dataset model makes predictions on input data
-    '''input_data = {'Open':[620,655,658,660,662,664],
-            'High':[630,665,660,665,660,665],
-            'Low':[620,625,630,640,645,650],
-            'PrevClose':[630,635,640,645,650,655]}'''
 
-    input_data = {'Open':Open,
-                   'High': High,
-                   'Low':Low,
-                   'PrevClose':PrevClose}
+    input_data = {'Open':[Open],
+                   'High': [High],
+                   'Low':[Low],
+                   'PrevClose':[PrevClose]}
 
     new_data = pd.DataFrame(input_data)
 
-    new_data = StandardScaler().fit_transform(new_data)
-    y_pred_data = lm.predict(new_data)
+    new_data = scaler.transform(new_data)
 
-    rmse = mean_squared_error(y_test,y_pred)
+    y_pred_data = lm.predict(new_data)
+    print(y_pred_data)
+
+    return round(float(y_pred_data[0]),2)
+    '''rmse = mean_squared_error(y_test,y_pred)
     print("Root mean squared error: {:.2f}".format(rmse))
 
     mae = mean_absolute_error(y_test,y_pred)
@@ -97,7 +95,7 @@ def make_predictions(lm,x_train,y_train,x_test,y_test,Open,High,Low,PrevClose):
     df_compare = pd.DataFrame({'actual': y_test,'predicted': y_pred})
     print(df_compare)
     correlation = np.corrcoef(df_compare['actual'], df_compare['predicted'])
-    print(f"Correlation: {correlation}")
+    print(f"Correlation: {correlation}")'''
 
 def visualize_predictions():
     data = pd.read_csv('/home/shoun1/batch_data.csv')

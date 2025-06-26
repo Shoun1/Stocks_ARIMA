@@ -4,7 +4,7 @@ from django.db import models
 class Prices(models.Model):
     Open = models.IntegerField()
     High = models.IntegerField()
-    Low = models.IntegerField()
+    Low = models.IntegerField(null=True,blank=True)
     PrevClose = models.IntegerField()
     class Meta:
         db_table='Prices'

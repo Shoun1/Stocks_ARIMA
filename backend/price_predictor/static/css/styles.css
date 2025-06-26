@@ -59,3 +59,26 @@ button.third:hover{
 body{
     background-color: #3f926b;
 }
+
+a{
+    color: black;
+    display: inline;
+    text-decoration: none;
+}
+
+/*navigation bar*/
+nav{
+    background-color:red;
+    border: 2px solid white;
+}
+
+li{
+    list-style-type: none;
+    display: inline-block;
+}
+
+li a{
+    color: white;
+    font-size: 18px;
+    font-weight: bold;
+}
