@@ -1,8 +1,8 @@
-# 📈 Stock Price Prediction Web App
+Stock Price Prediction Web App
 
-This project is a simple web application that predicts stock prices using a machine learning model. It uses historical stock data and applies regression techniques to forecast the closing price. The app is built using **Python**, **Django**, and **Matplotlib**, and includes an integrated ML model for predictions.
+This project is a simple web application that predicts stock prices using a machine learning model. It uses historical stock price data of LIC dataset and applies regression techniques to forecast the closing price. The app is built using **Python**, **Django**, and **Matplotlib**, and includes an integrated ML model for predictions.
 
-## ⚙️ Tech Stack
+Tech Stack
 
 - Python 3.10
 - Django
@@ -11,7 +11,7 @@ This project is a simple web application that predicts stock prices using a mach
 - yfinance (for live stock data)
 - Matplotlib (for plotting)
 
-## 🚀 How to Run
+How to Run
 
 1. **Clone the repo**
    ```bash
