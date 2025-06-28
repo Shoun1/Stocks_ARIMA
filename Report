@@ -1,0 +1,18 @@
+Project: Stock Price Prediction using Linear Regression
+
+Role: Developed a machine learning model to predict daily stock closing prices using historical trading data.
+
+Key Outcomes:
+
+Achieved 98.6% correlation between predicted and actual prices and an R² score of 0.97, demonstrating strong model fit.
+
+Implemented feature engineering using Open, High, Low, and Previous Close values as inputs.
+
+Performed data preprocessing and scaling with StandardScaler to improve model accuracy.
+
+Evaluated model performance using metrics like RMSE (7.68) and MAE (1.94).
+
+Generated plots to compare actual vs. predicted values and analyze trends visually.
+
+Also visualizations have been made on unseen data where ground truth is not known to compare actual and predicted prices for Opening stock prices judging 
+how well the model generalizes (or fits) itself to unseen data by hyperparameter tuning of X_train.
